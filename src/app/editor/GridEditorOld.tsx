@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, ComponentProps } from 'react';
+import React, { useState, useRef } from 'react';
 import { Cell, GridData } from '../types';
 import dynamic from "next/dynamic";
 import { KonvaEventObject } from 'konva/lib/Node';
