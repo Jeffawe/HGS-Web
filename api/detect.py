@@ -1,10 +1,12 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import cv2
 import numpy as np
 import base64
-import json
 import keras_ocr
-from http.server import BaseHTTPRequestHandler
-from io import BytesIO
+
+app = Flask(__name__)
+CORS(app)
 
 # Global variable to cache the OCR pipeline between invocations
 pipeline = None
@@ -94,96 +96,28 @@ def detect_shapes_with_ocr_image(image):
         shape_count += 1
 
     return results
-
-# def handler(request, response):
-#     """
-#     Vercel serverless function entry point.
-#     Expects a POST request with JSON body:
-#       { "image": "<base64-encoded-image-data>" }
-#     Returns JSON with OCR and shape detection results.
-#     """
-#     try:
-#         print("Gotten Request")
-#         # Get the JSON payload
-#         data = request.get_json()
-#         if data is None or "image" not in data:
-#             response.status_code = 400
-#             return json.dumps({"error": "No image provided."})
-
-#         # Decode the base64 image data
-#         image_data = data["image"]
-#         image_bytes = base64.b64decode(image_data)
-#         nparr = np.frombuffer(image_bytes, np.uint8)
-#         image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-#         if image is None:
-#             response.status_code = 400
-#             return json.dumps({"error": "Invalid image data."})
-
-#         # Process the image
-#         results = detect_shapes_with_ocr_image(image)
-
-#         response.status_code = 200
-#         response.set_header("Content-Type", "application/json")
-#         return json.dumps(results)
-
-#     except Exception as e:
-#         response.status_code = 500
-#         return json.dumps({"error": str(e)})
     
-class handler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        """
-        Handle POST requests from Vercel.
-        Expects a JSON body with:
-          { "image": "<base64-encoded-image-data>" }
-        Returns JSON with OCR and shape detection results.
-        """
-        try:
-            print("Gotten Request")
+@app.route('/api/detect', methods=['POST'])
+def detect():
+    try:
+        if not request.json or 'image' not in request.json:
+            return jsonify({"error": "No image provided."}), 400
 
-            # Get the content length to read the request body
-            content_length = int(self.headers.get('Content-Length', 0))
-            if content_length == 0:
-                self.send_response(400)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "No image provided."}).encode())
-                return
+        # Decode the base64 image data
+        image_data = request.json["image"]
+        image_bytes = base64.b64decode(image_data)
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            return jsonify({"error": "Invalid image data."}), 400
 
-            # Read and parse the JSON payload
-            body = self.rfile.read(content_length)
-            data = json.loads(body.decode('utf-8'))
-            if "image" not in data:
-                self.send_response(400)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "No image provided."}).encode())
-                return
+        # Process the image
+        results = detect_shapes_with_ocr_image(image)
+        return jsonify(results)
 
-            # Decode the base64 image data
-            image_data = data["image"]
-            image_bytes = base64.b64decode(image_data)
-            nparr = np.frombuffer(image_bytes, np.uint8)
-            image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-            if image is None:
-                self.send_response(400)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "Invalid image data."}).encode())
-                return
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-            # Process the image
-            results = detect_shapes_with_ocr_image(image)
-
-            # Send the response
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(results).encode())
-
-        except Exception as e:
-            self.send_response(500)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode())
-            return
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
