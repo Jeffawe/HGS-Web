@@ -4,6 +4,14 @@ import cv2
 import numpy as np
 import base64
 import keras_ocr
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+import tensorflow as tf
+
+physical_devices = tf.config.list_physical_devices('CPU')
+for device in physical_devices:
+    tf.config.experimental.set_memory_growth(device, True)
+
 
 app = Flask(__name__)
 CORS(app)
