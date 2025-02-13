@@ -6,13 +6,11 @@ import axios from 'axios';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const UploadImage: React.FC = () => {
-  // Local state for the file, result, loading indicator, and any error messages.
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Handle file selection
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
@@ -21,14 +19,12 @@ const UploadImage: React.FC = () => {
     }
   };
 
-  // Helper function to convert a File into a base64-encoded string
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
         const result = reader.result as string;
-        // Remove the data URI prefix (e.g., "data:image/png;base64,") if necessary
         const base64 = result.split(',')[1];
         resolve(base64);
       };
@@ -36,7 +32,6 @@ const UploadImage: React.FC = () => {
     });
   };
 
-  // Handle the button click to run the processing
   const handleRun = async () => {
     if (!selectedFile) {
       setError('Please select a file first.');
@@ -47,49 +42,46 @@ const UploadImage: React.FC = () => {
     setResult(null);
 
     try {
-      // Convert the file to a base64 string
       const base64Image = await convertFileToBase64(selectedFile);
-
-      // Send a POST request using axios to your serverless function endpoint
       const response = await axios.post(
         `${apiUrl}/api/detect`,
         { image: base64Image },
         { headers: { 'Content-Type': 'application/json' } }
       );
-
-
-      // Set the resulting JSON data into state
       setResult(response.data);
     } catch (err: unknown) {
       console.error(err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An error occurred while processing the image.');
-      }
+      setError(err instanceof Error ? err.message : 'An error occurred while processing the image.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Image Processor</h1>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
-      <button onClick={handleRun} disabled={loading || !selectedFile} style={{ marginLeft: '1rem' }}>
-        {loading ? 'Processing...' : 'Run'}
-      </button>
-
-      {error && <div style={{ color: 'red', marginTop: '1rem' }}>Error: {error}</div>}
-
-      {result && (
-        <div style={{ marginTop: '1rem' }}>
-          <h2>Result JSON</h2>
-          <pre style={{ backgroundColor: '#f4f4f4', padding: '1rem' }}>
-            {JSON.stringify(result, null, 2)}
-          </pre>
-        </div>
-      )}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-lg">
+        <h1 className="text-2xl font-semibold text-gray-700 mb-4 text-center">Image Processor</h1>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="block w-full text-sm text-gray-700 border border-gray-300 rounded-lg cursor-pointer p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={handleRun}
+          disabled={loading || !selectedFile}
+          className={`w-full py-2 px-4 rounded-lg font-semibold text-white transition-all ${loading || !selectedFile ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}
+        >
+          {loading ? 'Processing...' : 'Run'}
+        </button>
+        {error && <div className="mt-4 text-red-500 text-center">Error: {error}</div>}
+        {result && (
+          <div className="mt-4 p-4 bg-gray-200 rounded-lg overflow-x-auto">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Result JSON</h2>
+            <pre className="text-sm text-gray-600 whitespace-pre-wrap">{JSON.stringify(result, null, 2)}</pre>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
