@@ -1,4 +1,3 @@
-// app/grid/page.tsx
 import GridEditor from './GridEditorN';
 
 export default function GridPage() {

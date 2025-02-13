@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useRef } from 'react';
 import { Cell, GridData } from '../types';
 import dynamic from "next/dynamic";
