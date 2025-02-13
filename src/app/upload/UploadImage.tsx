@@ -3,6 +3,8 @@
 import React, { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const UploadImage: React.FC = () => {
   // Local state for the file, result, loading indicator, and any error messages.
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -50,7 +52,7 @@ const UploadImage: React.FC = () => {
 
       // Send a POST request using axios to your serverless function endpoint
       const response = await axios.post(
-        '/api/detect',
+        `${apiUrl}/api/detect`,
         { image: base64Image },
         { headers: { 'Content-Type': 'application/json' } }
       );
