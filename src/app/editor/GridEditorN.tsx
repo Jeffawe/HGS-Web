@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Stage, Layer, Rect, Text } from 'react-konva';
 import { Cell, GridData } from '../types';
-import { KonvaEventObject } from 'konva/lib/Node';
+import { Stage, Layer, Rect, Text } from 'react-konva';
+import { useRouter } from 'next/navigation';
 
 const CELL_SIZE = 50;
 const PADDING = 40;
@@ -16,19 +16,20 @@ const colors = [
 ];
 
 const GridEditor = () => {
-    const CELL_SIZE = 50;
-    const PADDING = 40;
-    const [gridWidth, setGridWidth] = useState(10);
-    const [gridHeight, setGridHeight] = useState(10);
+    const [gridWidth, setGridWidth] = useState(50);
+    const [gridHeight, setGridHeight] = useState(50);
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
-    const [gridData, setGridData] = useState<{ [key: string]: GridData }>({});
+    const [gridData, setGridData] = useState<Record<string, GridData>>({});
     const [inputValue, setInputValue] = useState('');
-    const [selectedColor, setSelectedColor] = useState('lightblue');
-    const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-    const inputRef = useRef(null);
-    const containerRef = useRef(null);
+    const [selectValue, setSelectValue] = useState<'Up' | 'Down' | 'Left' | 'Right'>('Up');
+    const [selectedColor, setSelectedColor] = useState('#9999ff');
     const [stageScale, setStageScale] = useState(1);
-    const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
+    const stageRef = useRef<any>(null);
+
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const selectRef = useRef<HTMLSelectElement | null>(null);
+
+    const router = useRouter();
 
     const handleCellClick = useCallback((x: number, y: number) => {
         setSelectedCell({ x, y });
@@ -44,6 +45,7 @@ const GridEditor = () => {
                     position: { x: selectedCell.x, y: selectedCell.y },
                     text: inputValue,
                     color: selectedColor,
+                    direction: selectValue
                 },
             }));
             setSelectedCell(null);
@@ -65,39 +67,20 @@ const GridEditor = () => {
         a.click();
     };
 
-    const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
+    const handleWheel = useCallback((e: any) => {
         e.evt.preventDefault();
-    
         const scaleBy = 1.1;
-        const stage = e.target.getStage();
-        
+        const stage = stageRef.current;
         if (!stage) return;
-        
+
         const oldScale = stage.scaleX();
-        const pointerPos = stage.getPointerPosition();
-        
-        if (!pointerPos) return;
-    
         const newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
-    
-        // Limit the zoom levels
-        if (newScale > 0.3 && newScale < 3) {
+
+        if (newScale >= MIN_SCALE && newScale <= MAX_SCALE) {
+            stage.scale({ x: newScale, y: newScale });
             setStageScale(newScale);
-    
-            const mousePointTo = {
-                x: (pointerPos.x - stage.x()) / oldScale,
-                y: (pointerPos.y - stage.y()) / oldScale,
-            };
-    
-            const newPos = {
-                x: pointerPos.x - mousePointTo.x * newScale,
-                y: pointerPos.y - mousePointTo.y * newScale,
-            };
-    
-            setStagePos(newPos);
         }
-    };
-    
+    }, []);
 
     const renderedCells = useMemo(() => {
         return Array.from({ length: gridWidth }).flatMap((_, x) =>
@@ -132,29 +115,22 @@ const GridEditor = () => {
             })
         );
     }, [gridWidth, gridHeight, gridData]);
-    
-    useEffect(() => {
-        const updateDimensions = () => {
-            setDimensions({
-                width: Math.max(window.innerWidth - 100, (gridWidth * CELL_SIZE) + (PADDING * 2)),
-                height: Math.max(window.innerHeight - 200, (gridHeight * CELL_SIZE) + (PADDING * 2))
-            });
-        };
-
-        updateDimensions();
-        window.addEventListener('resize', updateDimensions);
-        return () => window.removeEventListener('resize', updateDimensions);
-    }, [gridWidth, gridHeight]);
 
     return (
         <div className="flex flex-col items-center gap-4 p-4">
+            <button
+                onClick={() => router.back()}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 self-start"
+            >
+                ← Back
+            </button>
             <div className="flex gap-4 mb-4">
                 <label>Width:</label>
                 <input
                     type="number"
                     value={gridWidth}
                     onChange={(e) => setGridWidth(Number(e.target.value))}
-                    className="w-20 p-1 border rounded"
+                    className="w-20 p-1 border rounded text-black"
                     min="1"
                 />
                 <label>Height:</label>
@@ -162,7 +138,7 @@ const GridEditor = () => {
                     type="number"
                     value={gridHeight}
                     onChange={(e) => setGridHeight(Number(e.target.value))}
-                    className="w-20 p-1 border rounded"
+                    className="w-20 p-1 border rounded text-black"
                     min="1"
                 />
                 <button onClick={exportToJSON} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -177,12 +153,26 @@ const GridEditor = () => {
                             ref={inputRef}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
-                            className="p-2 border rounded"
+                            className="p-2 border rounded text-black"
                             placeholder="Enter text for cell"
                             autoFocus
                         />
+
+                        <select
+                            ref={selectRef}
+                            value={selectValue}
+                            onChange={(e) => setSelectValue(e.target.value as 'Up' | 'Down' | 'Left' | 'Right')}
+                            className="p-2 border rounded text-black"
+                        >
+                            <option value="Up">Up</option>
+                            <option value="Down">Down</option>
+                            <option value="Left">Left</option>
+                            <option value="Right">Right</option>
+                        </select>
+
+
                         <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                            Add Text
+                            Add
                         </button>
                     </form>
                     <div className="flex gap-2 items-center">
@@ -207,12 +197,11 @@ const GridEditor = () => {
                 style={{ width: '90vw', height: '70vh', overflowX: 'scroll', overflowY: 'scroll' }}
             >
                 <Stage
-                    width={dimensions.width}
-                    height={dimensions.height}
-                    onWheel={handleWheel}
+                    ref={stageRef}
+                    width={Math.max(800, gridWidth * CELL_SIZE + PADDING * 2)}
+                    height={Math.max(600, gridHeight * CELL_SIZE + PADDING * 2)}
                     scale={{ x: stageScale, y: stageScale }}
-                    position={stagePos}
-                    draggable
+                    onWheel={handleWheel}
                 >
                     <Layer>{renderedCells}</Layer>
                 </Stage>

@@ -8,5 +8,6 @@ export interface GridData
 {
     position: Cell,
     text: string,
-    color: string
+    color: string,
+    direction: 'Up' | 'Down' | 'Left' | 'Right'
 }

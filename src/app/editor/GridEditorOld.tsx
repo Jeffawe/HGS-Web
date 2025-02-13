@@ -6,16 +6,16 @@ import dynamic from "next/dynamic";
 
 // Dynamically import the Konva components to avoid SSR issues
 const Stage = dynamic(() => import("react-konva").then((mod) => mod.Stage), {
-  ssr: false,
+    ssr: false,
 });
 const Layer = dynamic(() => import("react-konva").then((mod) => mod.Layer), {
-  ssr: false,
+    ssr: false,
 });
 const Rect = dynamic(() => import("react-konva").then((mod) => mod.Rect), {
-  ssr: false,
+    ssr: false,
 });
 const Text = dynamic(() => import("react-konva").then((mod) => mod.Text), {
-  ssr: false,
+    ssr: false,
 })
 
 
@@ -27,7 +27,8 @@ const GridEditor = () => {
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
     const [gridData, setGridData] = useState<{ [key: string]: GridData }>({});
     const [inputValue, setInputValue] = useState('');
-    const [selectedColor, setSelectedColor] = useState('#lightblue');
+    const [selectValue, setSelectValue] = useState<'Up' | 'Down' | 'Left' | 'Right'>('Up');
+    const [selectedColor, setSelectedColor] = useState('#9999ff');
     const inputRef = useRef(null);
     const containerRef = useRef(null);
     const [stageScale, setStageScale] = useState(1);
@@ -58,7 +59,8 @@ const GridEditor = () => {
                 [`${selectedCell.x},${selectedCell.y}`]: {
                     position: { x: selectedCell.x, y: selectedCell.y },
                     text: inputValue,
-                    color: selectedColor
+                    color: selectedColor,
+                    direction: selectValue
                 }
             });
             setSelectedCell(null);
