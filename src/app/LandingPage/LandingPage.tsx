@@ -54,10 +54,10 @@ const LandingPage: React.FC = () => {
                             <span className="text-2xl font-bold">Flexible</span>
                             <p className="text-sm text-gray-400">Multiple Methods</p>
                         </div>
-                        <div>
+                    </div>
+                    <div>
                             <a href="https://www.flaticon.com/free-icons/smart-grid" title="smart grid icons">Smart grid icons created by Freepik - Flaticon</a>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
