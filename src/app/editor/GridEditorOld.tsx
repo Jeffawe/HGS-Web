@@ -31,7 +31,6 @@ const GridEditor = () => {
     const [selectValue, setSelectValue] = useState<'Up' | 'Down' | 'Left' | 'Right'>('Up');
     const [selectedColor, setSelectedColor] = useState('#9999ff');
     const containerRef = useRef(null);
-    const stageRef: ComponentProps<typeof Stage>["ref"] = useRef(null);
 
     const inputRef = useRef<HTMLInputElement | null>(null);
     const selectRef = useRef<HTMLSelectElement | null>(null);
@@ -52,7 +51,6 @@ const GridEditor = () => {
     const handleCellClick = (x: number, y: number) => {
         setSelectedCell({ x, y });
         setInputValue(gridData[`${x},${y}`]?.text || '');
-        setInputValue
     };
 
     const handleTextSubmit = (e: React.FormEvent) => {
