@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, ComponentProps } from 'react';
 import { Cell, GridData } from '../types';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import { useRouter } from 'next/navigation';
+import { KonvaEventObject } from 'konva/lib/Node';
 
 const CELL_SIZE = 50;
 const PADDING = 40;
@@ -24,7 +25,7 @@ const GridEditor = () => {
     const [selectValue, setSelectValue] = useState<'Up' | 'Down' | 'Left' | 'Right'>('Up');
     const [selectedColor, setSelectedColor] = useState('#9999ff');
     const [stageScale, setStageScale] = useState(1);
-    const stageRef = useRef<any>(null);
+    const stageRef: ComponentProps<typeof Stage>["ref"] = useRef(null);
 
     const inputRef = useRef<HTMLInputElement | null>(null);
     const selectRef = useRef<HTMLSelectElement | null>(null);
@@ -51,12 +52,12 @@ const GridEditor = () => {
             setSelectedCell(null);
             setInputValue('');
         }
-    }, [selectedCell, inputValue, selectedColor]);
+    }, [selectedCell, inputValue, selectValue, selectedColor]);
 
     const exportToJSON = () => {
         const objects = Object.entries(gridData).map(([coords, data]) => {
             const [x, y] = coords.split(',').map(Number);
-            return { position: { x, y }, text: data.text, color: data.color };
+            return { position: { x, y }, text: data.text, direction: data.direction };
         });
 
         const blob = new Blob([JSON.stringify(objects, null, 2)], { type: 'application/json' });
@@ -67,7 +68,7 @@ const GridEditor = () => {
         a.click();
     };
 
-    const handleWheel = useCallback((e: any) => {
+    const handleWheel = useCallback((e: KonvaEventObject<WheelEvent>) => {
         e.evt.preventDefault();
         const scaleBy = 1.1;
         const stage = stageRef.current;
@@ -114,7 +115,7 @@ const GridEditor = () => {
                 );
             })
         );
-    }, [gridWidth, gridHeight, gridData]);
+    }, [gridWidth, gridHeight, gridData, handleCellClick]);
 
     return (
         <div className="flex flex-col items-center gap-4 p-4">

@@ -6,7 +6,7 @@ import axios from 'axios';
 const UploadImage: React.FC = () => {
   // Local state for the file, result, loading indicator, and any error messages.
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,12 +55,16 @@ const UploadImage: React.FC = () => {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
-      
+
       // Set the resulting JSON data into state
       setResult(response.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'An error occurred while processing the image.');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An error occurred while processing the image.');
+      }
     } finally {
       setLoading(false);
     }

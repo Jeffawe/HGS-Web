@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, ComponentProps } from 'react';
 import { Cell, GridData } from '../types';
 import dynamic from "next/dynamic";
+import { KonvaEventObject } from 'konva/lib/Node';
 
 // Dynamically import the Konva components to avoid SSR issues
 const Stage = dynamic(() => import("react-konva").then((mod) => mod.Stage), {
@@ -29,8 +30,11 @@ const GridEditor = () => {
     const [inputValue, setInputValue] = useState('');
     const [selectValue, setSelectValue] = useState<'Up' | 'Down' | 'Left' | 'Right'>('Up');
     const [selectedColor, setSelectedColor] = useState('#9999ff');
-    const inputRef = useRef(null);
     const containerRef = useRef(null);
+    const stageRef: ComponentProps<typeof Stage>["ref"] = useRef(null);
+
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const selectRef = useRef<HTMLSelectElement | null>(null);
     const [stageScale, setStageScale] = useState(1);
     const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
 
@@ -87,11 +91,12 @@ const GridEditor = () => {
         a.click();
     };
 
-    const handleWheel = (e: any) => {
+    const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
         e.evt.preventDefault();
 
         const scaleBy = 1.1;
         const stage = e.target.getStage();
+        if(stage == null) return;
         const oldScale = stage.scaleX();
         const pointerPos = stage.getPointerPosition();
 
@@ -100,7 +105,7 @@ const GridEditor = () => {
         // Limit the zoom levels
         if (newScale > 0.3 && newScale < 3) {
             setStageScale(newScale);
-
+            if(pointerPos == null) return;
             const newPos = {
                 x: (pointerPos.x - stage.x()) / oldScale * newScale - pointerPos.x,
                 y: (pointerPos.y - stage.y()) / oldScale * newScale - pointerPos.y
@@ -148,15 +153,26 @@ const GridEditor = () => {
                             ref={inputRef}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
-                            className="p-2 border rounded"
+                            className="p-2 border rounded text-black"
                             placeholder="Enter text for cell"
                             autoFocus
                         />
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+
+                        <select
+                            ref={selectRef}
+                            value={selectValue}
+                            onChange={(e) => setSelectValue(e.target.value as 'Up' | 'Down' | 'Left' | 'Right')}
+                            className="p-2 border rounded text-black"
                         >
-                            Add Text
+                            <option value="Up">Up</option>
+                            <option value="Down">Down</option>
+                            <option value="Left">Left</option>
+                            <option value="Right">Right</option>
+                        </select>
+
+
+                        <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                            Add
                         </button>
                     </form>
 
