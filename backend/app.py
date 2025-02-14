@@ -10,7 +10,7 @@ import tensorflow as tf
 
 
 app = Flask(__name__)
-CORS(app, origins="https://hgs-web.vercel.app")
+CORS(app, resources={r"/*": {"origins": "*", "allow_headers": "*", "methods": "*"}})
 
 
 # Global variable to cache the OCR pipeline between invocations
