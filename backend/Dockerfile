@@ -16,4 +16,4 @@ COPY . .
 EXPOSE $PORT
 
 # Change the gunicorn command to explicitly reference the file
-CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 1 --timeout 0 "app:app"
+CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 1 --timeout 120 "app:app"

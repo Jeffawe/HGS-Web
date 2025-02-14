@@ -10,7 +10,6 @@ import tensorflow as tf
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*", "allow_headers": "*", "methods": "*"}})
 
 
 # Global variable to cache the OCR pipeline between invocations
@@ -125,4 +124,5 @@ def detect():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
