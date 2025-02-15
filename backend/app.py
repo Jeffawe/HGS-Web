@@ -10,7 +10,7 @@ import tensorflow as tf
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 
 # Global variable to cache the OCR pipeline between invocations
