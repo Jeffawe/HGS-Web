@@ -3,7 +3,7 @@ from flask_cors import CORS
 import cv2
 import numpy as np
 import base64
-import keras_ocr
+import easyocr
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import tensorflow as tf
@@ -14,14 +14,13 @@ CORS(app, supports_credentials=True)
 
 
 # Global variable to cache the OCR pipeline between invocations
-pipeline = None
+ocr_reader = None
 
-def get_pipeline():
-    global pipeline
-    if pipeline is None:
-        # This may take a while on the first request.
-        pipeline = keras_ocr.pipeline.Pipeline()
-    return pipeline
+def get_ocr_reader():
+    global ocr_reader
+    if ocr_reader is None:
+        ocr_reader = easyocr.Reader(['en'])  # Load English OCR model
+    return ocr_reader
 
 def calculate_vector(start_point, end_point):
     return (end_point[0] - start_point[0], end_point[1] - start_point[1])
@@ -32,7 +31,7 @@ def detect_shapes_with_ocr_image(image):
     Returns a list of dictionaries containing image info and details of each detected shape.
     """
     # Load (or reuse) the OCR pipeline
-    pipeline = get_pipeline()
+    reader = get_ocr_reader()
 
     # Get image dimensions
     height, width, channels = image.shape
@@ -78,13 +77,13 @@ def detect_shapes_with_ocr_image(image):
         roi = image[y:y + h, x:x + w]
 
         # Run OCR on the ROI
-        predictions = pipeline.recognize([roi])
-        if predictions and predictions[0]:
-            text = predictions[0][0][0]
-            confidence = predictions[0][0][1]
+        text_results = reader.readtext(roi)
+
+        # Extract the most confident OCR result
+        if text_results:
+            text, confidence = text_results[0][1], text_results[0][2]
         else:
-            text = ""
-            confidence = 0.0
+            text, confidence = "", 0.0
 
         # Calculate a vector (for example, from (0,0) to the first vertex)
         vector = calculate_vector((0, 0), approx[0][0])
