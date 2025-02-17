@@ -5,8 +5,6 @@ import numpy as np
 import base64
 import easyocr
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-import tensorflow as tf
 
 
 app = Flask(__name__)
