@@ -48,7 +48,7 @@ const UploadImage: React.FC = () => {
           { image: base64Image },
           { 
             headers: { 'Content-Type': 'application/json' },
-            timeout: 120000 
+            timeout: 200000 
           }
         );
       setResult(response.data);
