@@ -2,6 +2,7 @@
 
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import axios from 'axios';
+import { ImageGridData } from '../types';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hgs-web.onrender.com';
 
@@ -14,7 +15,7 @@ interface ModelStatus {
 
 const UploadImage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [result, setResult] = useState<any | null>(null);
+  const [result, setResult] = useState<ImageGridData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   // Add state for model status
@@ -162,7 +163,7 @@ const UploadImage: React.FC = () => {
 
   // Generate status indicator styles
   const getStatusClasses = () => {
-    let baseClasses = "mt-4 p-3 rounded-lg text-center";
+    const baseClasses = "mt-4 p-3 rounded-lg text-center";
     
     if (modelStatus.isLoaded) {
       return `${baseClasses} bg-green-100 text-green-800 border border-green-200`;
