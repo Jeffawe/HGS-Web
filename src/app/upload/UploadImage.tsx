@@ -28,7 +28,7 @@ const UploadImage: React.FC = () => {
   // Function to check model status
   const checkModelStatus = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/status`);
+      const response = await axios.get(`${apiUrl}/api/status`, { timeout: 300000 });
       if (response.data.status === 'ready') {
         setModelStatus({
           isLoaded: true,
@@ -64,7 +64,7 @@ const UploadImage: React.FC = () => {
   // Function to initiate model loading
   const startModelLoading = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/preload`);
+      const response = await axios.get(`${apiUrl}/api/preload`, { timeout: 300000 });
       if (response.data.status === 'ready') {
         setModelStatus({
           isLoaded: true,
