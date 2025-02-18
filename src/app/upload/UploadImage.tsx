@@ -43,11 +43,14 @@ const UploadImage: React.FC = () => {
 
     try {
       const base64Image = await convertFileToBase64(selectedFile);
-      const response = await axios.post(
-        `${apiUrl}/api/detect`,
-        { image: base64Image },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+       const response = await axios.post(
+          `${apiUrl}/api/detect`,
+          { image: base64Image },
+          { 
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 120000 
+          }
+        );
       setResult(response.data);
     } catch (err: unknown) {
       console.error(err);
