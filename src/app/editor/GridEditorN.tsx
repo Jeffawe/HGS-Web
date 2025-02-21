@@ -78,7 +78,7 @@ const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
                         position: { x: finalValue.x, y: finalValue.y },
                         text: item.text,
                         name: item.name,
-                        color: selectedColor || 'white',
+                        color: "#99ff99",
                         direction: item.direction,
                     },
                 }));
