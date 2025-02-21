@@ -9,7 +9,7 @@ export async function POST(request) {
     const dataId = Date.now().toString(36) + Math.random().toString(36).substr(2);
     
     // Store data with 1-hour expiration
-    await redis.set(`grid:${dataId}`, JSON.stringify(data), { ex: 3600 });
+    await redis.set(`grid:${dataId}`, JSON.stringify(data), { ex: 1200 });
     
     return NextResponse.json({ id: dataId }, { status: 200 });
   } catch (error) {

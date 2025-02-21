@@ -21,7 +21,7 @@ const LandingPage: React.FC = () => {
                             <Grid className="w-16 h-16 mx-auto mb-4 text-blue-400" />
                             <h2 className="text-2xl font-semibold mb-2">Grid Editor</h2>
                             <p className="text-gray-400 mb-6">Create your environment manually using our interactive grid system</p>
-                            <button onClick={() => router.push('/editor')} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                            <button onClick={() => router.push('/editor/none')} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                                 Open Editor
                             </button>
                         </div>
