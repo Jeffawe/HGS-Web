@@ -48,7 +48,7 @@ const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
     const fetchGridFromExternalSource = async () => {
         try {
             if (dataID) {
-                const response = await axios.get<ImageGridData[]>('/api/get-grid?id=${id}')
+                const response = await axios.get<ImageGridData[]>(`/api/get-grid?id=${dataID}`)
                 console.log(response.data);
                 convertToGrid(response.data)
             }
