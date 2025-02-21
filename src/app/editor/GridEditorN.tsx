@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState, useRef, useCallback, useMemo, ComponentProps } from 'react';
-import { Cell, GridData } from '../types';
+import React, { useState, useRef, useCallback, useMemo, ComponentProps, useEffect } from 'react';
+import { Cell, GridData, ImageGridData } from '../types';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import { useRouter } from 'next/navigation';
 import { KonvaEventObject } from 'konva/lib/Node';
+import axios from 'axios';
 
 const CELL_SIZE = 50;
 const PADDING = 40;
@@ -16,7 +17,11 @@ const colors = [
     '#ff99ff', '#99ffff', '#ffffff', '#cccccc',
 ];
 
-const GridEditor = () => {
+interface GridEditorProps {
+    dataID?: string | undefined; // Optional in case it’s undefined initially
+}
+
+const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
     const [gridWidth, setGridWidth] = useState(50);
     const [gridHeight, setGridHeight] = useState(50);
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null);
@@ -36,6 +41,43 @@ const GridEditor = () => {
         setSelectedCell({ x, y });
         setInputValue(gridData[`${x},${y}`]?.text || '');
     }, [gridData]);
+
+    const fetchGridFromExternalSource = async () => {
+        try {
+            if (dataID) {
+                const response = await axios.get<ImageGridData[]>('/api/get-grid?id=${id}')
+                console.log(response.data);
+                convertToGrid(response.data)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const convertToGrid = (data:ImageGridData[]) => {
+        try {
+            data.map((item: ImageGridData, index: number) => {
+                setGridData((prev) => ({
+                    ...prev,
+                    [`${item.position.x},${item.position.y}`]: {
+                        position: { x: item.position.x, y: item.position.y },
+                        text: item.text,
+                        name: item.name,
+                        color: selectedColor || 'white',
+                        direction: item.direction
+                    },
+                }));
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        if (dataID) {
+            fetchGridFromExternalSource();
+        }
+    }, [dataID])
 
     const handleTextSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();

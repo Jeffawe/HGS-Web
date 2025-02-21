@@ -16,5 +16,5 @@ export interface ImageGridData {
     position: Cell,
     width: number,
     height: number,
-    direction: number
+    direction: 'Up' | 'Down' | 'Left' | 'Right'
 }
