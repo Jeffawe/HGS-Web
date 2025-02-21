@@ -15,7 +15,7 @@ const UploadImage: React.FC = () => {
       setTimeout(() => {
         window.location.href = 'https://colab.research.google.com/drive/18eD4Elnh8Pt1CRidhv7u1h9bt0pVGWf8#scrollTo=ls9AALizHi0T';
       }, 1000);
-    } catch (err) {
+    } catch {
       setError('An error occurred while redirecting. Please try again.');
       setLoading(false);
     }
@@ -26,17 +26,16 @@ const UploadImage: React.FC = () => {
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg transform transition-all hover:scale-105">
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Image Processor</h1>
         <p className="text-gray-600 text-center mb-6">
-          Due to the large size of the image processing application, it cannot be hosted directly on this website. 
-          However, I've made it easy for you to access it on Google Colab. Simply click the button below, and you'll 
-          be redirected to the Colab notebook where you can run the image processor. Please follow the instructions 
+          Due to the large size of the image processing application, it cannot be hosted directly on this website.
+          However, I&apos;ve made it easy for you to access it on Google Colab. Simply click the button below, and you&apos;ll
+          be redirected to the Colab notebook where you can run the image processor. Please follow the instructions
           provided there.
         </p>
         <button
           onClick={handleRun}
           disabled={loading}
-          className={`w-full py-3 px-6 rounded-xl font-semibold text-white transition-all flex items-center justify-center ${
-            loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
+          className={`w-full py-3 px-6 rounded-xl font-semibold text-white transition-all flex items-center justify-center ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
         >
           {loading ? (
             <>

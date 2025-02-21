@@ -56,7 +56,7 @@ const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
 
     const convertToGrid = (data:ImageGridData[]) => {
         try {
-            data.map((item: ImageGridData, index: number) => {
+            data.map((item: ImageGridData) => {
                 setGridData((prev) => ({
                     ...prev,
                     [`${item.position.x},${item.position.y}`]: {
