@@ -90,8 +90,8 @@ const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
     }
 
     const getGridValue = (x: number, y: number): Cell => {
-        var finalXValue = (x / paperWidth) * gridWidth;
-        var finalYValue = (y / paperBreadth) * gridHeight;
+        const finalXValue = (x / paperWidth) * gridWidth;
+        const finalYValue = (y / paperBreadth) * gridHeight;
 
         return { x: finalXValue, y: finalYValue }
     }
