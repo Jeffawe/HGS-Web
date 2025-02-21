@@ -32,6 +32,9 @@ const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
     const [stageScale, setStageScale] = useState(1);
     const stageRef: ComponentProps<typeof Stage>["ref"] = useRef(null);
 
+    const [paperWidth, setPaperWidth] = useState(0)
+    const [paperBreadth, setPaperBreadth] = useState(0)
+
     const inputRef = useRef<HTMLInputElement | null>(null);
     const selectRef = useRef<HTMLSelectElement | null>(null);
 
@@ -54,23 +57,43 @@ const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
         }
     }
 
-    const convertToGrid = (data:ImageGridData[]) => {
+    const convertToGrid = (data: ImageGridData[]) => {
         try {
-            data.map((item: ImageGridData) => {
+            // Remove the first item from the data array
+            const firstItem = data.shift(); 
+            if (firstItem) {
+                const { width, height } = firstItem;
+                setPaperBreadth(height);
+                setPaperWidth(width);
+            }
+
+            // Process the remaining items in the data array
+            data.forEach((item: ImageGridData) => {
+                const finalValue = getGridValue(item.position.x, item.position.y);
+
+                // Update grid data
                 setGridData((prev) => ({
                     ...prev,
                     [`${item.position.x},${item.position.y}`]: {
-                        position: { x: item.position.x, y: item.position.y },
+                        position: { x: finalValue.x, y: finalValue.y },
                         text: item.text,
                         name: item.name,
                         color: selectedColor || 'white',
-                        direction: item.direction
+                        direction: item.direction,
                     },
                 }));
-            })
+            });
+
         } catch (error) {
-            console.log(error)
+            console.error("Error converting grid data:", error);
         }
+    }
+
+    const getGridValue = (x: number, y: number): Cell => {
+        var finalXValue = (x / paperWidth) * gridWidth;
+        var finalYValue = (y / paperBreadth) * gridHeight;
+
+        return { x: finalXValue, y: finalYValue }
     }
 
     useEffect(() => {
