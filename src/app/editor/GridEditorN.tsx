@@ -121,17 +121,32 @@ const GridEditor: React.FC<GridEditorProps> = ({ dataID }) => {
     }, [selectedCell, inputValue, selectValue, selectedColor]);
 
     const exportToJSON = () => {
-        const objects = Object.entries(gridData).map(([coords, data]) => {
+        // Create default values object as first element
+        const defaultValues = {
+            position: { x:0, y:0 },
+            width: gridWidth,
+            height: gridHeight,
+            text: "original",
+            direction: "Up",
+            name: "original"
+        };
+    
+        // Create array of cell objects
+        const cellObjects = Object.entries(gridData).map(([coords, data]) => {
             const [x, y] = coords.split(',').map(Number);
-            return { position: { x, y }, text: data.text, direction: data.direction };
+            return { name: data.text, position: { x, y }, text: data.text, width: 0, height: 0, direction: data.direction };
         });
-
+    
+        // Combine default values with cell objects
+        const objects = [defaultValues, ...cellObjects];
+    
         const blob = new Blob([JSON.stringify(objects, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'grid-layout.json';
         a.click();
+        URL.revokeObjectURL(url); // Clean up the URL object
     };
 
     const handleWheel = useCallback((e: KonvaEventObject<WheelEvent>) => {
