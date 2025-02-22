@@ -12,7 +12,7 @@ const LandingPage: React.FC = () => {
             <div className="container mx-auto px-4 py-16">
                 <div className="text-center mb-16">
                     <h1 className="text-6xl font-bold mb-4">Harmony Grid System Builder</h1>
-                    <p className="text-xl text-gray-300 mb-8">Create complex Unity environments faster with our intuitive grid system</p>
+                    <p className="text-xl text-gray-300 mb-8">Create complex Unity environments faster with an intuitive grid system</p>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-center gap-8 max-w-3xl mx-auto">
@@ -40,7 +40,6 @@ const LandingPage: React.FC = () => {
                 </div>
 
                 <div className="text-center mt-16">
-                    <p className="text-gray-400">Our AI-powered system helps you create Unity environments a bit quicker</p>
                     <div className="mt-8 flex justify-center gap-4">
                         <div className="bg-gray-800 px-4 py-2 rounded-lg">
                             <span className="text-2xl font-bold">Fast</span>
